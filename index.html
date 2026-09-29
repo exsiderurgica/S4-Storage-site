@@ -21,7 +21,7 @@
 </head>
 <body>
   <div class="wrap">
-    <header><div class="brand">S4 STORAGE</div><div class="version">ANDROID · v0.6.2</div></header>
+    <header><div class="brand">S4 STORAGE</div><div class="version">ANDROID · v0.6.3</div></header>
     <main>
       <section>
         <h1>YOUR S-4 FILES.<br>ON ANDROID.</h1>
@@ -55,7 +55,7 @@
     const APK_URL='./S4-Storage-latest.apk';
     const PAYPAL_URL='https://paypal.me/Exsiderurgica';
     const modal=document.getElementById('donationModal');
-    function startDownload(){const a=document.createElement('a');a.href=APK_URL;a.download='S4-Storage-v0.6.2.apk';document.body.appendChild(a);a.click();a.remove();modal.classList.remove('open')}
+    function startDownload(){const a=document.createElement('a');a.href=APK_URL;a.download='S4-Storage-v0.6.3.apk';document.body.appendChild(a);a.click();a.remove();modal.classList.remove('open')}
     document.getElementById('downloadBtn').addEventListener('click',()=>modal.classList.add('open'));
     document.getElementById('freeDownload').addEventListener('click',startDownload);
     document.getElementById('donateDownload').addEventListener('click',()=>{window.open(PAYPAL_URL,'_blank','noopener,noreferrer');setTimeout(startDownload,250)});
