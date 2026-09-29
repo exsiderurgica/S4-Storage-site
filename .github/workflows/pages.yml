@@ -5,7 +5,8 @@ on:
     branches: [ "main" ]
     paths:
       - "index.html"
-      - "S4-Storage-v0.6.2.apk"
+      - "S4-Storage-latest.apk"
+      - "S4-Storage-v*.apk"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -27,19 +28,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+
       - name: Prepare site
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p _site
           cp index.html _site/index.html
-          cp S4-Storage-v0.6.2.apk _site/S4-Storage-v0.6.2.apk
-          cp S4-Storage-v0.6.2.apk _site/S4-Storage-latest.apk
+          cp S4-Storage-latest.apk _site/S4-Storage-latest.apk
+          cp S4-Storage-v*.apk _site/ 2>/dev/null || true
           touch _site/.nojekyll
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
