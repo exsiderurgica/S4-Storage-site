@@ -61,5 +61,16 @@
     document.getElementById('donateDownload').addEventListener('click',()=>{window.open(PAYPAL_URL,'_blank','noopener,noreferrer');setTimeout(startDownload,250)});
     modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.classList.remove('open')});
   </script>
+
+<script data-hidden-site-counter="s4-storage-visits">
+(()=>{
+  const SESSION_KEY='exsiderurgica_s4_storage_visit_counted';
+  try{
+    if(sessionStorage.getItem(SESSION_KEY)) return;
+    sessionStorage.setItem(SESSION_KEY,'1');
+  }catch(e){}
+  fetch('https://abacus.jasoncameron.dev/hit/exsiderurgica-hidden-site-stats-93f6c1b0/s4-storage-visits',{cache:'no-store',keepalive:true}).catch(()=>{});
+})();
+</script>
 </body>
 </html>
