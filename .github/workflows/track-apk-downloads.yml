@@ -1,0 +1,39 @@
+name: Track APK downloads
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: s4-storage-track-apk-downloads
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish tracked release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="$(jq -r '.version' release.json)"
+          SOURCE="$(jq -r '.source_apk' release.json)"
+          TAG="s4-storage-${VERSION}"
+
+          test -n "$VERSION"
+          test -f "$SOURCE"
+          cp "$SOURCE" S4-Storage.apk
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            if ! gh release view "$TAG" --json assets --jq '.assets[].name' | grep -Fxq 'S4-Storage.apk'; then
+              gh release upload "$TAG" S4-Storage.apk
+            fi
+          else
+            gh release create "$TAG" S4-Storage.apk               --title "S4 Storage ${VERSION}"               --notes "Tracked APK download release for S4 Storage ${VERSION}."
+          fi
