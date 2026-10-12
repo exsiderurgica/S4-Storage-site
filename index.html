@@ -17,7 +17,9 @@
     .features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:18px 0 42px}.feature{border-top:2px solid var(--line);padding-top:12px;font-size:14px;line-height:1.45}.feature strong{display:block;margin-bottom:5px}footer{border-top:2px solid var(--line);padding-top:18px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;font-size:12px;line-height:1.5;color:var(--muted)}
     .modal-backdrop{position:fixed;inset:0;background:rgba(38,38,38,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal-backdrop.open{display:flex}.modal{width:min(520px,100%);background:var(--bg);border:2px solid var(--line);border-radius:16px;padding:24px;box-shadow:12px 12px 0 rgba(38,38,38,.28)}.modal h2{margin:0 0 10px;font-size:28px;letter-spacing:-.035em}.modal p{margin:0 0 20px;line-height:1.5;color:#46413c}.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.small{font-size:11px;color:var(--muted);margin-top:13px!important}
     @media(max-width:720px){.wrap{padding-top:26px}main{grid-template-columns:1fr;padding-top:34px}.device{order:2}.features{grid-template-columns:1fr}.modal-actions{grid-template-columns:1fr}header{align-items:flex-start}}
-  </style>
+  
+.public-stats{padding:36px 0}.public-stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.public-stat{border:1px solid var(--line,var(--l));padding:22px;background:var(--panel,var(--p))}.public-stat span{display:block;font-size:12px;letter-spacing:.08em}.public-stat strong{display:block;font-size:clamp(30px,7vw,52px);margin-top:8px}.public-stats-note{font-size:12px;line-height:1.6;opacity:.75}@media(max-width:380px){.public-stats-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
   <div class="wrap">
@@ -41,7 +43,8 @@
       <div class="feature"><strong>DRAG + UNDO</strong>Move files by drag and drop and undo the latest operation.</div>
       <div class="feature"><strong>IMPORT / EXPORT</strong>Transfer files and safely eject the connected S-4 storage.</div>
     </section>
-    <footer><span>Free download. Optional donations support continued development.</span><span>Independent companion project. Not affiliated with or endorsed by Torso Electronics.</span></footer>
+    <section id="stats" class="public-stats" aria-label="Project statistics"><div><h2>Visits &amp; downloads</h2><div class="public-stats-grid"><div class="public-stat"><span>SITE VISITS</span><strong id="publicVisitCount" aria-live="polite">—</strong></div><div class="public-stat"><span>APK DOWNLOADS</span><strong id="publicDownloadCount" aria-live="polite">—</strong></div></div><p class="public-stats-note">Visits are counted once per browser session. APK downloads are reported by GitHub across published releases, including direct download links. Figures may update with a delay.</p></div></section>
+<footer><span>Free download. Optional donations support continued development.</span><span>Independent companion project. Not affiliated with or endorsed by Torso Electronics.</span></footer>
   </div>
   <div class="modal-backdrop" id="donationModal" role="dialog" aria-modal="true" aria-labelledby="donationTitle">
     <div class="modal">
@@ -62,14 +65,24 @@
     modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.classList.remove('open')});
   </script>
 
-<script data-hidden-site-counter="s4-storage-visits">
+<script data-public-site-counter="s4-storage-visits">
 (()=>{
-  const SESSION_KEY='exsiderurgica_s4_storage_visit_counted';
-  try{
-    if(sessionStorage.getItem(SESSION_KEY)) return;
-    sessionStorage.setItem(SESSION_KEY,'1');
-  }catch(e){}
-  fetch('https://abacus.jasoncameron.dev/hit/exsiderurgica-hidden-site-stats-93f6c1b0/s4-storage-visits',{cache:'no-store',keepalive:true}).catch(()=>{});
+ const sessionKey='exsiderurgica_s4_storage_visit_counted';
+ const base='https://abacus.jasoncameron.dev';
+ const path='/exsiderurgica-hidden-site-stats-93f6c1b0/s4-storage-visits';
+ const show=(id,n)=>{if(Number.isFinite(n)&&n>=0)document.getElementById(id).textContent=n.toLocaleString()};
+ async function visits(){
+  let counted=false;
+  try{counted=!!sessionStorage.getItem(sessionKey);if(!counted)sessionStorage.setItem(sessionKey,'1')}catch(e){}
+  try{const r=await fetch(base+(counted?'/get':'/hit')+path,{cache:'no-store',keepalive:true});if(!r.ok)throw Error('counter');const d=await r.json();show('publicVisitCount',Number(d.value))}
+  catch(e){try{const r=await fetch(base+'/get'+path,{cache:'no-store'});if(r.ok){const d=await r.json();show('publicVisitCount',Number(d.value))}}catch(_){}}
+ }
+ async function downloads(){
+  const cacheKey='S4-Storage-site_public_downloads';
+  try{const cached=JSON.parse(localStorage.getItem(cacheKey));if(cached&&Number.isFinite(cached.value))show('publicDownloadCount',cached.value);if(cached&&Date.now()-cached.time<300000)return}catch(e){}
+  try{let total=0,page=1;while(true){const r=await fetch('https://api.github.com/repos/exsiderurgica/S4-Storage-site/releases?per_page=100&page='+page,{headers:{Accept:'application/vnd.github+json'}});if(!r.ok)throw Error('downloads');const releases=await r.json();if(!Array.isArray(releases))throw Error('releases');for(const release of releases){if(!release.draft)for(const asset of release.assets||[]){if(/\.apk$/i.test(asset.name))total+=asset.download_count||0}}if(releases.length<100)break;page++}show('publicDownloadCount',total);try{localStorage.setItem(cacheKey,JSON.stringify({value:total,time:Date.now()}))}catch(e){}}catch(e){}
+ }
+ visits();downloads();
 })();
 </script>
 </body>
